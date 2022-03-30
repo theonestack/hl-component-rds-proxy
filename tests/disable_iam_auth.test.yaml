@@ -1,0 +1,6 @@
+test_metadata:
+  type: config
+  name: disable_iam_auth
+  description: disable the proxy IAM authentication
+
+iam_auth: DISABLED

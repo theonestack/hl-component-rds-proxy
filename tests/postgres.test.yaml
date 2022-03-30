@@ -1,0 +1,6 @@
+test_metadata:
+  type: config
+  name: postgres
+  description: set the proxy db engine to postgres
+
+database_engine: POSTGRESQL

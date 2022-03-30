@@ -1,0 +1,2 @@
+database_engine: MYSQL # POSTGRESQL | MYSQL
+iam_auth: REQUIRED # REQUIRED | DISABLED

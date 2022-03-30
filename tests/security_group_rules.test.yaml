@@ -1,0 +1,21 @@
+test_metadata:
+  type: config
+  name: security_group_rules
+  description: set the description for your test
+
+test_parameters:
+  MyAppSecurityGroupId: sg-123456789
+  
+security_group_rules:
+  ingress:
+    -
+      from: 5432
+      protocol: tcp
+      security_group_id: ${MyAppSecurityGroupId}
+      desc: access to the postgres port from another security group
+  egress:
+    - 
+      from: '-1'
+      protocol: '-1'
+      ip: 0.0.0.0/0
+      desc: allow all egress traffic

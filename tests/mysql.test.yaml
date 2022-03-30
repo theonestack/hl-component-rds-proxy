@@ -1,0 +1,6 @@
+test_metadata:
+  type: config
+  name: mysql
+  description: set the proxy db engine to mysql
+
+database_engine: MYSQL
