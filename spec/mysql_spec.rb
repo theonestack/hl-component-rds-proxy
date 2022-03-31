@@ -62,11 +62,11 @@ describe 'compiled component rds-proxy' do
       end
       
       it "to have property RoleArn" do
-          expect(resource["Properties"]["RoleArn"]).to eq({"Ref"=>"SecretsManagerRole"})
+          expect(resource["Properties"]["RoleArn"]).to eq({"Fn::GetAtt"=>["SecretsManagerRole", "Arn"]})
       end
       
       it "to have property VpcSecurityGroupIds" do
-          expect(resource["Properties"]["VpcSecurityGroupIds"]).to eq({"Ref"=>"SecurityGroup"})
+          expect(resource["Properties"]["VpcSecurityGroupIds"]).to eq([{"Ref"=>"SecurityGroup"}])
       end
       
       it "to have property VpcSubnetIds" do
@@ -112,11 +112,40 @@ describe 'compiled component rds-proxy' do
       end
       
       it "to have property DBClusterIdentifiers" do
-          expect(resource["Properties"]["DBClusterIdentifiers"]).to eq({"Ref"=>"TargetDBClusterIdentifier"})
+          expect(resource["Properties"]["DBClusterIdentifiers"]).to eq([{"Ref"=>"TargetDBClusterIdentifier"}])
       end
       
       it "to have property TargetGroupName" do
           expect(resource["Properties"]["TargetGroupName"]).to eq("default")
+      end
+      
+    end
+    
+    context "ProxyRecord" do
+      let(:resource) { template["Resources"]["ProxyRecord"] }
+
+      it "is of type AWS::Route53::RecordSet" do
+          expect(resource["Type"]).to eq("AWS::Route53::RecordSet")
+      end
+      
+      it "to have property HostedZoneName" do
+          expect(resource["Properties"]["HostedZoneName"]).to eq({"Fn::Sub"=>"${EnvironmentName}.${DnsDomain}."})
+      end
+      
+      it "to have property Name" do
+          expect(resource["Properties"]["Name"]).to eq({"Fn::Sub"=>"postgres-proxy.${EnvironmentName}.${DnsDomain}."})
+      end
+      
+      it "to have property Type" do
+          expect(resource["Properties"]["Type"]).to eq("CNAME")
+      end
+      
+      it "to have property TTL" do
+          expect(resource["Properties"]["TTL"]).to eq("60")
+      end
+      
+      it "to have property ResourceRecords" do
+          expect(resource["Properties"]["ResourceRecords"]).to eq([{"Fn::GetAtt"=>["RdsProxy", "Endpoint"]}])
       end
       
     end
