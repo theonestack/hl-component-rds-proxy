@@ -37,7 +37,7 @@ CloudFormation do
     IdleClientTimeout Ref(:IdleClientTimeout)
     RequireTLS Ref(:RequireTLS)
     DBProxyName FnSub("${EnvironmentName}-${ProxyName}")
-    RoleArn Ref(:SecretsManagerRole)
+    RoleArn FnGetAtt(:SecretsManagerRole, :Arn)
     VpcSecurityGroupIds [Ref(:SecurityGroup)]
     VpcSubnetIds Ref(:SubnetIds)
     Tags proxy_tags
