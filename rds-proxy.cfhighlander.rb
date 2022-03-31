@@ -8,9 +8,10 @@ CfhighlanderTemplate do
   Parameters do
     ComponentParam 'EnvironmentName', 'dev', isGlobal: true
     ComponentParam 'EnvironmentType', 'development', allowedValues: ['development','production'], isGlobal: true
+    ComponentParam 'DnsDomain', ''
 
     ComponentParam 'TargetDBClusterIdentifier', description: 'RDS Aurora cluster identifer to connect to the proxy'
-
+    
     ComponentParam 'ProxyName', 'rdsproxy', description: 'name of the rds proxy required by cloudformation. this value prefixed with the environment name'
     ComponentParam 'SecretCredentials', description: 'secrets manager arn of the secret. format of the secret must be json {"username": "user", "password": "pass"}'
 
@@ -28,6 +29,8 @@ CfhighlanderTemplate do
 
     ComponentParam 'VPCId'
     ComponentParam 'SubnetIds', type: 'CommaDelimitedList'
+
+    ComponentParam 'NamespaceId' if defined? service_discovery
   end
 
 

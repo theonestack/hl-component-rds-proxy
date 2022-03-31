@@ -1,5 +1,7 @@
 CloudFormation do
 
+  Condition(:CreateHostRecord, FnNot(FnEquals(Ref(:DnsDomain), '')))
+
   proxy_tags = []
   proxy_tags << { Key: 'Name', Value: FnSub("${EnvironmentName}-#{component_name}") }
   proxy_tags << { Key: 'Environment', Value: Ref(:EnvironmentName) }
@@ -64,9 +66,57 @@ CloudFormation do
     TargetGroupName 'default' # Currently, this property must be set to default. https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbproxytargetgroup.html
   }
 
-  Output(:ProxyWriterEndpoint) {
+  Route53_RecordSet(:ProxyRecord) {
+    Condition(:CreateHostRecord)
+    HostedZoneName FnSub("#{external_parameters[:dns_format]}.")
+    Name FnSub("#{external_parameters[:hostname]}.#{external_parameters[:dns_format]}.")
+    Type 'CNAME'
+    TTL '60'
+    ResourceRecords [ FnGetAtt(:RdsProxy, :Endpoint) ]
+  }
+
+  registry = {}
+  service_discovery = external_parameters.fetch(:service_discovery, {})
+
+  unless service_discovery.empty?
+    ServiceDiscovery_Service(:ServiceRegistry) {
+      NamespaceId Ref(:NamespaceId)
+      Name service_discovery['name']  if service_discovery.has_key? 'name'
+      DnsConfig({
+        DnsRecords: [{
+          TTL: 60,
+          Type: 'CNAME'
+        }],
+        RoutingPolicy: 'WEIGHTED'
+      })
+      if service_discovery.has_key? 'healthcheck'
+        HealthCheckConfig service_discovery['healthcheck']
+      else
+        HealthCheckCustomConfig ({ FailureThreshold: (service_discovery['failure_threshold'] || 1) })
+      end
+    }
+
+    ServiceDiscovery_Instance(:RegisterInstance) {
+      InstanceAttributes(
+        AWS_INSTANCE_CNAME: FnGetAtt(:RdsProxy, :Endpoint)
+      )
+      ServiceId Ref(:ServiceRegistry)
+    }
+
+    Output(:ServiceRegistry) {
+      Value(Ref(:ServiceRegistry))
+      Export FnSub("${EnvironmentName}-#{external_parameters[:component_name]}-CloudMapService")
+    }
+  end
+
+  Output(:ProxyName) {
+    Value Ref(:RdsProxy)
+    Export FnSub("${EnvironmentName}-#{external_parameters[:component_name]}-name")
+  }
+
+  Output(:ProxyEndpoint) {
     Value FnGetAtt(:RdsProxy, :Endpoint)
-    Export FnSub("${EnvironmentName}-#{external_parameters[:component_name]}-writer-endpoint")
+    Export FnSub("${EnvironmentName}-#{external_parameters[:component_name]}-endpoint")
   }
 
   Output(:ProxyArn) {

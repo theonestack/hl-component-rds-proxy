@@ -1,2 +1,5 @@
 database_engine: MYSQL # POSTGRESQL | MYSQL
 iam_auth: REQUIRED # REQUIRED | DISABLED
+
+dns_format: ${EnvironmentName}.${DnsDomain}
+hostname: postgres-proxy
