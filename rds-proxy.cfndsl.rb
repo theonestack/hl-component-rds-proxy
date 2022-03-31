@@ -1,5 +1,5 @@
 CloudFormation do
-    
+
   proxy_tags = []
   proxy_tags << { Key: 'Name', Value: FnSub("${EnvironmentName}-#{component_name}") }
   proxy_tags << { Key: 'Environment', Value: Ref(:EnvironmentName) }
@@ -38,7 +38,7 @@ CloudFormation do
     RequireTLS Ref(:RequireTLS)
     DBProxyName FnSub("${EnvironmentName}-${ProxyName}")
     RoleArn Ref(:SecretsManagerRole)
-    VpcSecurityGroupIds Ref(:SecurityGroup)
+    VpcSecurityGroupIds [Ref(:SecurityGroup)]
     VpcSubnetIds Ref(:SubnetIds)
     Tags proxy_tags
   }
