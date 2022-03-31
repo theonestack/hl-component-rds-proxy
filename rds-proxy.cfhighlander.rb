@@ -11,6 +11,8 @@ CfhighlanderTemplate do
     ComponentParam 'DnsDomain', ''
 
     ComponentParam 'TargetDBClusterIdentifier', description: 'RDS Aurora cluster identifer to connect to the proxy'
+    ComponentParam 'TargetDBClusterPort', database_engine == 'POSTGRESQL' ? '5432': '3306', description: 'RDS Aurora cluster identifer to connect to the proxy'
+    ComponentParam 'DBClusterSecurityGroup', type: 'AWS::EC2::SecurityGroup::Id'
     
     ComponentParam 'ProxyName', 'rdsproxy', description: 'name of the rds proxy required by cloudformation. this value prefixed with the environment name'
     ComponentParam 'SecretCredentials', description: 'secrets manager arn of the secret. format of the secret must be json {"username": "user", "password": "pass"}'

@@ -27,6 +27,14 @@ CloudFormation do
     Tags proxy_tags
   }
 
+  EC2_SecurityGroupIngress(:ProxyPortAccessToDBCluster) {
+    IpProtocol 'tcp'
+    FromPort Ref(:TargetDBClusterPort)
+    ToPort Ref(:TargetDBClusterPort)
+    SourceSecurityGroupId FnGetAtt(:SecurityGroup, :GroupId)
+    GroupId Ref(:DBClusterSecurityGroup)
+  }
+
   RDS_DBProxy(:RdsProxy) {
     Auth([
       {
