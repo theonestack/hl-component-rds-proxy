@@ -60,7 +60,7 @@ CloudFormation do
       ConnectionBorrowTimeout: Ref(:ConnectionBorrowTimeout)
     })
     DBProxyName Ref(:RdsProxy)
-    DBClusterIdentifiers Ref(:TargetDBClusterIdentifier)
+    DBClusterIdentifiers [Ref(:TargetDBClusterIdentifier)]
     TargetGroupName 'default' # Currently, this property must be set to default. https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-rds-dbproxytargetgroup.html
   }
 
