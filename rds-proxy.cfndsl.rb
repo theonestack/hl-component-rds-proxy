@@ -117,7 +117,7 @@ CloudFormation do
     }
   end
 
-  Output(:ProxyName) {
+  Output(:Proxy) {
     Value Ref(:RdsProxy)
     Export FnSub("${EnvironmentName}-#{external_parameters[:component_name]}-name")
   }
