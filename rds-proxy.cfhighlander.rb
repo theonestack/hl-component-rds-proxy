@@ -15,7 +15,13 @@ CfhighlanderTemplate do
     ComponentParam 'DBClusterSecurityGroup', type: 'AWS::EC2::SecurityGroup::Id'
     
     ComponentParam 'ProxyName', 'rdsproxy', description: 'name of the rds proxy required by cloudformation. this value prefixed with the environment name'
-    ComponentParam 'SecretCredentials', description: 'secrets manager arn of the secret. format of the secret must be json {"username": "user", "password": "pass"}'
+    
+    users.each do |name, config|
+      if config.has_key?('secret_arn_parameter')
+        ComponentParam config['secret_arn_parameter'],
+          description: "#{name} RDS username and password Secrets Manager ARN. format of the secret must be json {\"username\": \"user\", \"password\": \"pass\"}"
+      end
+    end
 
     ComponentParam 'IdleClientTimeout', 120, type: 'Number', 
       description: 'proxy idle connection timeout in seconds'

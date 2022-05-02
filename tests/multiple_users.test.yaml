@@ -1,0 +1,20 @@
+test_metadata:
+  type: config
+  name: multiple_users
+  description: set the description for your test
+
+users:
+  default:
+    disabled: true
+  writer:
+    secret_arn_parameter: WriterSecretCredentials
+    iam_auth: REQUIRED
+    description: write access to the whole database
+  readonly:
+    secret_arn_parameter: ReadonlySecretCredentials
+    iam_auth: REQUIRED
+    description: readonly access to the whole database
+  audit:
+    secret_arn_parameter: AuditSecretCredentials
+    iam_auth: REQUIRED
+    description: read and write access to the audit tables
