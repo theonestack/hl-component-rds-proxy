@@ -34,6 +34,35 @@ describe 'compiled component rds-proxy' do
       
     end
     
+    context "ProxyPortAccessToDBCluster" do
+      let(:resource) { template["Resources"]["ProxyPortAccessToDBCluster"] }
+
+      it "is of type AWS::EC2::SecurityGroupIngress" do
+          expect(resource["Type"]).to eq("AWS::EC2::SecurityGroupIngress")
+      end
+      
+      it "to have property IpProtocol" do
+          expect(resource["Properties"]["IpProtocol"]).to eq("tcp")
+      end
+      
+      it "to have property FromPort" do
+          expect(resource["Properties"]["FromPort"]).to eq({"Ref"=>"TargetDBClusterPort"})
+      end
+      
+      it "to have property ToPort" do
+          expect(resource["Properties"]["ToPort"]).to eq({"Ref"=>"TargetDBClusterPort"})
+      end
+      
+      it "to have property SourceSecurityGroupId" do
+          expect(resource["Properties"]["SourceSecurityGroupId"]).to eq({"Fn::GetAtt"=>["SecurityGroup", "GroupId"]})
+      end
+      
+      it "to have property GroupId" do
+          expect(resource["Properties"]["GroupId"]).to eq({"Ref"=>"DBClusterSecurityGroup"})
+      end
+      
+    end
+    
     context "RdsProxy" do
       let(:resource) { template["Resources"]["RdsProxy"] }
 
