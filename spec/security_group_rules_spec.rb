@@ -28,12 +28,45 @@ describe 'compiled component rds-proxy' do
           expect(resource["Properties"]["GroupDescription"]).to eq({"Fn::Join"=>[" ", [{"Ref"=>"EnvironmentName"}, "rds-proxy", "security group"]]})
       end
       
+      it "to have property SecurityGroupIngress" do
+          expect(resource["Properties"]["SecurityGroupIngress"]).to eq([{"FromPort"=>5432, "IpProtocol"=>"tcp", "ToPort"=>5432, "Description"=>{"Fn::Sub"=>"access to the postgres port from another security group"}, "SourceSecurityGroupId"=>{"Fn::Sub"=>"${MyAppSecurityGroupId}"}}])
+      end
+      
       it "to have property SecurityGroupEgress" do
-          expect(resource["Properties"]["SecurityGroupEgress"]).to eq([{"FromPort"=>5432, "IpProtocol"=>"tcp", "ToPort"=>5432, "Description"=>{"Fn::Sub"=>"access to the postgres port from another security group"}, "SourceSecurityGroupId"=>{"Fn::Sub"=>"${MyAppSecurityGroupId}"}}, {"FromPort"=>"-1", "IpProtocol"=>"-1", "ToPort"=>"-1", "Description"=>{"Fn::Sub"=>"allow all egress traffic"}, "CidrIp"=>{"Fn::Sub"=>"0.0.0.0/0"}}])
+          expect(resource["Properties"]["SecurityGroupEgress"]).to eq([{"FromPort"=>"-1", "IpProtocol"=>"-1", "ToPort"=>"-1", "Description"=>{"Fn::Sub"=>"allow all egress traffic"}, "CidrIp"=>{"Fn::Sub"=>"0.0.0.0/0"}}])
       end
       
       it "to have property Tags" do
           expect(resource["Properties"]["Tags"]).to eq([{"Key"=>"Name", "Value"=>{"Fn::Sub"=>"${EnvironmentName}-rds-proxy"}}, {"Key"=>"Environment", "Value"=>{"Ref"=>"EnvironmentName"}}, {"Key"=>"EnvironmentType", "Value"=>{"Ref"=>"EnvironmentType"}}])
+      end
+      
+    end
+    
+    context "ProxyPortAccessToDBCluster" do
+      let(:resource) { template["Resources"]["ProxyPortAccessToDBCluster"] }
+
+      it "is of type AWS::EC2::SecurityGroupIngress" do
+          expect(resource["Type"]).to eq("AWS::EC2::SecurityGroupIngress")
+      end
+      
+      it "to have property IpProtocol" do
+          expect(resource["Properties"]["IpProtocol"]).to eq("tcp")
+      end
+      
+      it "to have property FromPort" do
+          expect(resource["Properties"]["FromPort"]).to eq({"Ref"=>"TargetDBClusterPort"})
+      end
+      
+      it "to have property ToPort" do
+          expect(resource["Properties"]["ToPort"]).to eq({"Ref"=>"TargetDBClusterPort"})
+      end
+      
+      it "to have property SourceSecurityGroupId" do
+          expect(resource["Properties"]["SourceSecurityGroupId"]).to eq({"Fn::GetAtt"=>["SecurityGroup", "GroupId"]})
+      end
+      
+      it "to have property GroupId" do
+          expect(resource["Properties"]["GroupId"]).to eq({"Ref"=>"DBClusterSecurityGroup"})
       end
       
     end
