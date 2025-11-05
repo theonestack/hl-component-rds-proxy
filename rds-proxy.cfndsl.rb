@@ -17,7 +17,7 @@ CloudFormation do
     GroupDescription FnJoin(' ', [ Ref(:EnvironmentName), external_parameters[:component_name], 'security group' ])
     
     if security_group_rules.has_key?('ingress')
-      SecurityGroupEgress generate_security_group_rules(security_group_rules['ingress'], ip_blocks, true)
+      SecurityGroupIngress generate_security_group_rules(security_group_rules['ingress'], ip_blocks, true)
     end
     
     if security_group_rules.has_key?('egress')
