@@ -3,4 +3,7 @@ test_metadata:
   name: disable_iam_auth
   description: disable the proxy IAM authentication
 
-iam_auth: DISABLED
+users:
+  default:
+    secret_arn_parameter: SecretCredentials
+    iam_auth: DISABLED

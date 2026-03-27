@@ -35,14 +35,31 @@ CloudFormation do
     GroupId Ref(:DBClusterSecurityGroup)
   }
 
+  auth_config = []
+  external_parameters[:users].each do |name,config|
+    if config.has_key?('disabled') && config['disabled']
+      next
+    end
+
+    user = {
+      AuthScheme: 'SECRETS',
+      IAMAuth: config.fetch('iam_auth', 'REQUIRED'),
+      SecretArn: Ref(config['secret_arn_parameter'])
+    }
+
+    if config.has_key?('description')
+      user[:Description] = config['description']
+    end
+
+    if config.has_key?('username')
+      user[:UserName ] = config['username']
+    end
+
+    auth_config << user
+  end
+
   RDS_DBProxy(:RdsProxy) {
-    Auth([
-      {
-        AuthScheme: 'SECRETS',
-        IAMAuth: external_parameters[:iam_auth],
-        SecretArn: Ref(:SecretCredentials)
-      }
-    ])
+    Auth auth_config
     EngineFamily database_engine
     IdleClientTimeout Ref(:IdleClientTimeout)
     RequireTLS Ref(:RequireTLS)

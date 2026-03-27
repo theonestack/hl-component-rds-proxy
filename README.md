@@ -45,13 +45,27 @@ database_engine: POSTGRESQL
 database_engine: MYSQL
 ```
 
-**IAM Auth**
+**User Authentication**
 
-IAM authentication to the proxy is enabled by default, to disable this use the following config
+RDS proxy takes a list of users that can access the database through the proxy. 
+
+Each user requires a secret in AWS Secrets Manager which contains the username and password in a json format.
+The Secrets Manager ARN is required to be passed through as a parameter to the component. [Setting up database credentials in Secrets Manager](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy-setup.html#rds-proxy-secrets-arns)
+
+```json
+{"username":"admin","password":"choose_your_own_password"}
+```
+
+A user is enabled by default with IAM authentication enabled. This user can be [disabled](tests/multiple_users.test.yaml) or [added](tests/multiple_users.test.yaml) onto.
 
 ```yaml
-iam_auth: DISABLED
+users:
+  default:
+    secret_arn_parameter: SecretCredentials
+    iam_auth: REQUIRED # REQUIRED | DISABLED
 ```
+
+IAM auth can also be [disabled](tests/disable_iam_auth.test.yaml) on the default user 
 
 **Security Group Rules**
 
